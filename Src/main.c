@@ -46,7 +46,10 @@ int main(void)
 {
     peripherals_init();
     room_control_app_init();
-    uart_send_string("Sistema de Control de Sala Inicializado!\r\n");
+    uart_send_string("Controlador de sala v2.0 \r\n");
+    uart_send_string("Estado inicial:\r\n");
+    uart_send_string(" - Lámpara: 20%\r\n");
+    uart_send_string(" - Puerta: Cerrada\r\n");
 
     // Bucle principal: procesa eventos
     while (1) {
