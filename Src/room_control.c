@@ -14,15 +14,21 @@ typedef enum {
 // Variable de estado global
 room_state_t current_state = ROOM_IDLE;
 static uint32_t led_on_time = 0;
+volatile int lamp_duty_cycle = PWM_INITIAL_DUTY;
+//implementacion de funcion que guarda el duty cycle actual
+void set_lamp_duty_cycle(int duty_cycle){
+    lamp_duty_cycle = duty_cycle;
+}
 
 void room_control_app_init(void)
 {
     // Inicializar PWM al duty cycle inicial (estado IDLE -> LED apagado)
     tim3_ch1_pwm_set_duty_cycle(PWM_INITIAL_DUTY);
 }
-
+//variable que guarda el estado actual de pwm
 void room_control_on_button_press(void)
 {
+
     if (current_state == ROOM_IDLE) {
         current_state = ROOM_OCCUPIED;
         tim3_ch1_pwm_set_duty_cycle(100);  // PWM al 100%
@@ -88,7 +94,25 @@ void room_control_on_uart_receive(char received_char)
             break;
         case 'S':
         case 's':
-            uart_send_string("falta implementar estado\r\n");
+            uart_send_string("Estado actual:\r\n");
+            if (lamp_duty_cycle == 20) {
+                uart_send_string(" - Lámpara: 20%\r\n");
+            } else if (set_lamp_duty_cycle == 0) {
+                uart_send_string(" - Lámpara: Apagada\r\n");
+            } else if (set_lamp_duty_cycle == 100) {
+                uart_send_string(" - Lámpara: Encendida\r\n");
+            } else if (set_lamp_duty_cycle == 10){
+                uart_send_string(" - Lámpara: 10%\r\n");
+            }
+            else if (lamp_duty_cycle == 30){
+                uart_send_string(" - Lámpara: 30%\r\n");
+            }
+            else if (lamp_duty_cycle == 40){
+                uart_send_string(" - Lámpara: 40%\r\n");
+            }
+            else if (lamp_duty_cycle == 50){
+                uart_send_string(" - Lámpara: 50%\r\n");
+            }
             break;  
         case '?':
             uart_send_string("Comandos disponibles:\r\n");
@@ -112,7 +136,7 @@ void room_control_update(void)
     if (current_state == ROOM_OCCUPIED) {
         if (systick_get_ms() - led_on_time >= LED_TIMEOUT_MS) {
             current_state = ROOM_IDLE;
-            tim3_ch1_pwm_set_duty_cycle(0);
+            tim3_ch1_pwm_set_duty_cycle(lamp_duty_cycle);
             uart_send_string("Timeout: Sala vacía\r\n");
         }
     }
