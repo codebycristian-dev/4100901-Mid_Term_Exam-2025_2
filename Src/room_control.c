@@ -35,6 +35,7 @@ void room_control_on_button_press(void)
     }
 }
 
+
 void room_control_on_uart_receive(char received_char)
 {
     switch (received_char) {
@@ -55,8 +56,8 @@ void room_control_on_uart_receive(char received_char)
             led_on_time = systick_get_ms();
             uart_send_string("Sala ocupada\r\n");
             break;
-        case 'I':
-        case 'i':
+        case 'C':
+        case 'c':
             current_state = ROOM_IDLE;
             tim3_ch1_pwm_set_duty_cycle(0);
             uart_send_string("Sala vacía\r\n");
@@ -80,6 +81,23 @@ void room_control_on_uart_receive(char received_char)
         case '5':
             tim3_ch1_pwm_set_duty_cycle(50);
             uart_send_string("PWM: 50%\r\n");
+            break;
+        case '0':
+            tim3_ch1_pwm_set_duty_cycle(0);
+            uart_send_string("PWM: 0%\r\n");
+            break;
+        case 'S':
+        case 's':
+            uart_send_string("falta implementar estado\r\n");
+            break;  
+        case '?':
+            uart_send_string("Comandos disponibles:\r\n");
+            uart_send_string(" H/h: Encender lámpara (100% PWM)\r\n L/l: Apagar lámpara (0% PWM)\r\n");
+            uart_send_string(" O/o: Marcar sala como ocupada\r\n");
+            uart_send_string(" C/c: Marcar sala como vacía\r\n");
+            uart_send_string(" 0-5: Ajustar PWM a 0%,10%,20%,30%,40%,50%\r\n");
+            uart_send_string(" S/s: Mostrar estado actual\r\n");
+            uart_send_string(" ?: Mostrar esta ayuda\r\n");
             break;
         default:
             uart_send_string("Comando desconocido: ");
